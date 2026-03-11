@@ -1,5 +1,4 @@
 async function scan() {
-	console.log('scanning...');
 	const currentPage = figma.currentPage;
 	const selection = figma.currentPage.selection;
 
@@ -41,7 +40,6 @@ async function scan() {
 			const instance = instances[index];
 			const main = await instance.getMainComponentAsync();
 			if (main?.id === node.id) {
-				console.log('instance found', instance.name);
 				figma.ui.postMessage({
 					type: 'scan:result',
 					id: instance.id,
