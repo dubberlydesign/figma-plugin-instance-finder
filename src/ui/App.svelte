@@ -18,9 +18,53 @@
 	let progress = $state(0);
 	let selection = $state<string[]>([]);
 
+	let nodes = $derived<NodeInfo[]>(
+		component ? [component, ...items] : items
+	);
+
+	let itemsContainer: HTMLDivElement;
+
 	const scan = () => {
 		parent.postMessage({ pluginMessage: { type: 'scan' } }, '*');
 	};
+
+	const navigate = (nodeId: string, pageId: string) => {
+		parent.postMessage({
+			pluginMessage: {
+				type: 'navigate',
+				nodeId,
+				pageId,
+			}
+		}, '*');
+	}
+
+	const handleKeyDown = (event: KeyboardEvent) => {
+		let selectedItem: Element | null = null;
+
+		for (const element of itemsContainer.children) {
+			if (element === document.activeElement) {
+				selectedItem = element;
+			}
+		}
+
+		if (!selectedItem) return;
+
+		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+			event.preventDefault();
+		}
+
+		let sibling: Element | null = null;
+
+		if (event.key === 'ArrowDown') {
+			sibling = selectedItem.nextElementSibling;
+		} else if (event.key === 'ArrowUp') {
+			sibling = selectedItem.previousElementSibling;
+		}
+
+		if (sibling instanceof HTMLElement) {
+			sibling.focus();
+		}
+	}
 
 	const handleMessage = (event: MessageEvent) => {
 		const msg = event.data.pluginMessage;
@@ -68,33 +112,23 @@
 	};
 </script>
 
-<svelte:window on:message={handleMessage} />
+<svelte:window on:keydown={handleKeyDown} on:message={handleMessage} />
 
 <div class="container">
 	{#if error}
 		<div class="error">{error}</div>
 	{/if}
 
-	<div class="items">
-		{#if component}
+	<div class="items" bind:this={itemsContainer}>
+		{#each nodes as node}
+			{@const navigateToNode = () => navigate(node.id, node.page.id)}
 			<Node
-				type="component"
-				id={component.id}
-				name={component.name}
-				pageId={component.page.id}
-				pageName={component.page.name}
-				selected={selection.includes(component.id)}
-			/>
-		{/if}
-
-		{#each items as item}
-			<Node
-				type="instance"
-				id={item.id}
-				name={item.name}
-				pageId={item.page.id}
-				pageName={item.page.name}
-				selected={selection.includes(item.id)}
+				type={node === component ? 'component' : 'instance'}
+				name={node.name}
+				pageName={node.page.name}
+				selected={selection.includes(node.id)}
+				onfocus={navigateToNode}
+				onclick={navigateToNode}
 			/>
 		{/each}
 	</div>

@@ -1,9 +1,11 @@
 import js from '@eslint/js';
+import globals from "globals";
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import tsParser from '@typescript-eslint/parser';
 import svelteParser from 'svelte-eslint-parser';
 import sveltePlugin from 'eslint-plugin-svelte';
+import * as figmaPlugin from '@figma/eslint-plugin-figma-plugins';
 
 export default defineConfig([
 	js.configs.recommended,
@@ -28,6 +30,18 @@ export default defineConfig([
 		files: ['src/main/**/*.ts'],
 		languageOptions: {
 			globals: { figma: 'readonly', __html__: 'readonly' },
+		},
+		plugins: {
+			'@figma/figma-plugins': figmaPlugin,
+		},
+		rules: { '@typescript-eslint/triple-slash-reference': 'off' },
+	},
+
+	// UI thread specifics
+	{
+		files: ['src/ui/**/*.{ts,svelte}'],
+		languageOptions: {
+			globals: { ...globals.browser },
 		},
 		rules: { '@typescript-eslint/triple-slash-reference': 'off' },
 	},

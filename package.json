@@ -10,10 +10,12 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@figma/eslint-plugin-figma-plugins": "^1.0.0",
     "@figma/plugin-typings": "^1.100.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tsconfig/svelte": "^5.0.4",
     "eslint-plugin-svelte": "^3.15.1",
+    "globals": "^17.4.0",
     "plugma": "^2.2.3",
     "shadcn-ui": "latest",
     "svelte": "^5.0.5",
